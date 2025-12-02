@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"strings"
 	"syscall"
@@ -20,7 +21,7 @@ import (
 )
 
 const (
-	version           = "3.0.1"
+	version           = "3.1.0"
 	minLength         = 8
 	maxLength         = 256
 	defaultLength     = 16
@@ -84,13 +85,6 @@ func (es *EntropySource) AddMouseEvent(x, y int, button uint8, timestamp int64) 
 	}
 
 	es.timings = append(es.timings, timestamp)
-}
-
-func (es *EntropySource) AddTimestamp() {
-	now := time.Now().UnixNano()
-	buf := make([]byte, 8)
-	binary.LittleEndian.PutUint64(buf, uint64(now))
-	es.data = append(es.data, buf...)
 }
 
 func (es *EntropySource) Finalize() {
@@ -333,7 +327,7 @@ func collectMouseEntropy(target int, verbose bool) (*EntropySource, error) {
 				if lastX > 0 || lastY > 0 {
 					dx := float64(x - lastX)
 					dy := float64(y - lastY)
-					dist := sqrt(dx*dx + dy*dy)
+					dist := math.Sqrt(dx*dx + dy*dy)
 					totalDistance += dist
 				}
 
@@ -436,18 +430,6 @@ func makeProgressBar(percent float64, width int) string {
 	return "[" + strings.Repeat("█", filled) + strings.Repeat("░", empty) + "]"
 }
 
-// Helper: square root approssimato
-func sqrt(x float64) float64 {
-	if x <= 0 {
-		return 0
-	}
-	z := x / 2
-	for i := 0; i < 10; i++ {
-		z = (z + x/z) / 2
-	}
-	return z
-}
-
 // Combina le sorgenti di entropia
 func combineEntropy(keyboard, mouse *EntropySource, verbose bool) ([]byte, error) {
 	if verbose {
@@ -482,17 +464,10 @@ func combineEntropy(keyboard, mouse *EntropySource, verbose bool) ([]byte, error
 		fmt.Printf("\n📈 Timing Analysis:\n")
 		fmt.Printf("   Keyboard: %.2f ms avg, %.2f ms variance\n", avgK, stdK)
 		fmt.Printf("   Mouse: %.2f ms avg, %.2f ms variance\n", avgM, stdM)
-		fmt.Printf("   Difference: %.2f ms (higher = better)\n", abs(avgK-avgM))
+		fmt.Printf("   Difference: %.2f ms (higher = better)\n", math.Abs(avgK-avgM))
 	}
 
 	return finalHash[:], nil
-}
-
-func abs(x float64) float64 {
-	if x < 0 {
-		return -x
-	}
-	return x
 }
 
 // Genera password usando l'entropia combinata
