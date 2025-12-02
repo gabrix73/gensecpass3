@@ -1,7 +1,8 @@
-# gensecpass3
-gensecpass3 generates cryptographically strong passwords by combining entropy from two independent physical sources: keyboard input and mouse movement.
+# 🔐 gensecpass3
 
 **Ultra-Secure Password Generator with Dual Physical Entropy Collection**
+
+gensecpass3 generates cryptographically strong passwords by combining entropy from two independent physical sources: keyboard input and mouse movement. This dual-channel approach ensures true randomness that cannot be predicted or replicated.
 
 ## Features
 
@@ -20,8 +21,6 @@ gensecpass3 addresses multiple threat vectors:
 |--------|------------|
 | Weak PRNG | Physical entropy from human input |
 | Memory Forensics | memguard protected buffers with automatic wiping |
-| Timing Attacks | Nanosecond jitter collection |
-| Correlation Attacks | Two independent physical channels |
 | Cold Boot Attacks | Immediate memory destruction on exit |
 | File Recovery | DoD 5220.22-M secure wipe |
 
